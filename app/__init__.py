@@ -1,4 +1,5 @@
 from flask import Flask
+import app.bootstrap.mongo
 from .blueprints.home import home
 from .blueprints.auth import auth
 from .blueprints.chat import chat
