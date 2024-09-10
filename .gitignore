@@ -1,0 +1,77 @@
+# Python specific
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.env
+*.venv
+venv/
+env/
+.Python
+*.sqlite3
+*.db
+*.sqlite
+
+# Environment variables
+.env
+*.env
+
+# Virtual environment
+/venv
+/env
+
+# MacOS specific
+.DS_Store
+
+# Logs
+*.log
+*.out
+*.err
+
+# Docker specific
+*.pid
+*.seed
+*.pid.lock
+**/.idea/
+
+# Flask specific
+instance/
+.webassets-cache
+
+# Pytest cache
+.pytest_cache/
+.coverage
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# System files
+Thumbs.db
+desktop.ini
+
+# Docker specific
+# Ignore Docker files generated during builds or runs
+docker-compose.override.yml
+docker-compose.dev.yml
+docker-compose.prod.yml
+
+# Flask SQLite Database files (if any)
+*.db
+*.sqlite3
+
+# Ignore all .env files (e.g., for environment variables)
+.env
+*.env
+
+# Ignore compiled wheels
+*.whl
+
+# Ignore virtual environment folders
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# Ignore MongoDB data (if not using Docker volumes)
+mongo-data/
