@@ -9,5 +9,5 @@ class ChatMessage(me.EmbeddedDocument):
 
 class Chat(me.Document):
     user_id = me.ObjectIdField(required=True)
-    messages = me.EmbeddedDocumentListField(document_type=ChatMessage, required=True)
-    created_at = me.DateField(required=True)
+    messages = me.EmbeddedDocumentListField(document_type=ChatMessage, default=[])
+    created_at = me.DateTimeField(required=True)

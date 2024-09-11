@@ -4,11 +4,15 @@ from datetime import datetime
 import openai
 from bson import ObjectId
 from flask import Blueprint, jsonify, request
+from openai import OpenAI
 
 from app.middleware.jwt_required import jwt_required
 from app.models.chat import Chat, ChatMessage
 
 chat = Blueprint('chat', __name__)
+
+client = OpenAI()
+
 
 @chat.route('/list', methods=['GET'])
 @jwt_required
@@ -30,7 +34,7 @@ def create_chat():
         new_chat = Chat(
             user_id=user_id,
             messages=[],
-            created_at=datetime.utcnow().date()
+            created_at=datetime.utcnow()
         )
         new_chat.save()
         return jsonify({'status': 'success', 'chat_id': str(new_chat.id)}), 201
@@ -52,7 +56,7 @@ def send_message():
 
         chat = Chat.objects(id=ObjectId(chat_id), user_id=user_id).first()
 
-        if not chat:
+        if not chat or str(chat.user_id) != str(user_id):
             return jsonify({'status': 'error', 'message': 'Chat not found'}), 404
 
         new_message = ChatMessage(
@@ -74,13 +78,13 @@ def send_message():
             'content': message_text
         })
 
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="ft:gpt-4o-mini-2024-07-18:personal::9zIBverq",
             messages=previous_messages,
         )
 
-        gpt_reply = response['choices'][0]['message']['content']
-
+        gpt_reply = response.choices[0].message.content
+        print("gpt_reply", gpt_reply)
         gpt_message = ChatMessage(
             text=gpt_reply,
             is_users=False,
@@ -89,7 +93,15 @@ def send_message():
         chat.messages.append(gpt_message)
         chat.save()
 
-        return jsonify({'status': 'success', 'message': 'Message sent successfully'}), 200
+        return jsonify({
+            'status': 'success',
+            'message': 'Message sent successfully',
+            'data': {
+                'text': gpt_message.text,
+                'is_users': False,
+                'created_at': gpt_message.created_at
+            }
+        }), 200
 
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
@@ -100,15 +112,14 @@ def send_message():
 def get_all_messages():
     try:
         user_id = ObjectId(request.user_id)
-        data = request.json
-        chat_id = data.get('chat_id')
+        chat_id = request.args.get('chat_id')
 
         if not chat_id:
             return jsonify({'status': 'error', 'message': 'Missing chat_id'}), 400
 
         chat = Chat.objects(id=ObjectId(chat_id), user_id=user_id).first()
 
-        if not chat:
+        if not chat or str(chat.user_id) != str(user_id):
             return jsonify({'status': 'error', 'message': 'Chat not found'}), 404
 
         messages = [{
