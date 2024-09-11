@@ -12,8 +12,8 @@ def create_app():
 
     CORS(app, resources={r"/*": {"origins": "*"}})
 
-    app.register_blueprint(home, url_prefix='/')
-    app.register_blueprint(auth, url_prefix='/auth')
-    app.register_blueprint(chat, url_prefix='/chat')
+    app.register_blueprint(home, url_prefix='/api')
+    app.register_blueprint(auth, url_prefix='/api/auth')
+    app.register_blueprint(chat, url_prefix='/api/chat')
 
     return app
