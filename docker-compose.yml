@@ -7,14 +7,21 @@ services:
       - "5000:5000"
     depends_on:
       - mongo
-
+    environment:
+      MONGO_DB_NAME: flask_app_db
+      MONGO_DB_HOST: mongo
+      MONGO_DB_USER: root
+      MONGO_DB_PASSWORD: jCGvr4E6hJk4ejLcdWIhAbcjdu4qUBLzMc0BqrFe
   mongo:
-    image: mongo:5.0
+    image: mongo:latest
     container_name: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: jCGvr4E6hJk4ejLcdWIhAbcjdu4qUBLzMc0BqrFe
     ports:
-      - "27017:27017"
+      - "27023:27017"
     volumes:
-      - mongo-data:/data/db
+      - mongo-data:/mongo_data
 
 volumes:
   mongo-data:
