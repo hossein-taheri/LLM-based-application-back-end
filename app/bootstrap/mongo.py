@@ -1,6 +1,5 @@
 import os
 import mongoengine as me
-from dotenv import load_dotenv
 
 
 def init_mongo():
@@ -16,7 +15,3 @@ def init_mongo():
         mongo_uri = f"mongodb://{db_host}:{db_port}"
 
     me.connect(db_name, host=mongo_uri)
-
-
-load_dotenv()
-init_mongo()

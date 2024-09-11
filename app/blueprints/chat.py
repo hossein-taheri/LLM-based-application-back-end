@@ -1,26 +1,123 @@
+import os
+from datetime import datetime
+
+import openai
+from bson import ObjectId
 from flask import Blueprint, jsonify, request
 
 from app.middleware.jwt_required import jwt_required
+from app.models.chat import Chat, ChatMessage
 
 chat = Blueprint('chat', __name__)
+
+@chat.route('/list', methods=['GET'])
+@jwt_required
+def list_all_chats():
+    try:
+        user_id = ObjectId(request.user_id)
+        chats = Chat.objects(user_id=user_id).only('id', 'created_at')
+        chat_list = [{'chat_id': str(chat.id), 'created_at': chat.created_at} for chat in chats]
+        return jsonify({'status': 'success', 'chats': chat_list}), 200
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 
 @chat.route('/create', methods=['POST'])
 @jwt_required
 def create_chat():
-    return request.user_id
-
-
-@chat.route('/list', methods=['GET'])
-def list_chat():
-    pass
+    try:
+        user_id = ObjectId(request.user_id)
+        new_chat = Chat(
+            user_id=user_id,
+            messages=[],
+            created_at=datetime.utcnow().date()
+        )
+        new_chat.save()
+        return jsonify({'status': 'success', 'chat_id': str(new_chat.id)}), 201
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 
 @chat.route('/send-message', methods=['POST'])
+@jwt_required
 def send_message():
-    pass
+    try:
+        user_id = ObjectId(request.user_id)
+        data = request.json
+        chat_id = data.get('chat_id')
+        message_text = data.get('message')
+
+        if not chat_id or not message_text:
+            return jsonify({'status': 'error', 'message': 'Missing chat_id or message'}), 400
+
+        chat = Chat.objects(id=ObjectId(chat_id), user_id=user_id).first()
+
+        if not chat:
+            return jsonify({'status': 'error', 'message': 'Chat not found'}), 404
+
+        new_message = ChatMessage(
+            text=message_text,
+            is_users=True,
+            created_at=datetime.utcnow()
+        )
+
+        chat.messages.append(new_message)
+        chat.save()
+
+        previous_messages = [
+            {'role': 'user' if msg.is_users else 'assistant', 'content': msg.text}
+            for msg in chat.messages
+        ]
+
+        previous_messages.append({
+            'role': 'user',
+            'content': message_text
+        })
+
+        response = openai.ChatCompletion.create(
+            model="ft:gpt-4o-mini-2024-07-18:personal::9zIBverq",
+            messages=previous_messages,
+        )
+
+        gpt_reply = response['choices'][0]['message']['content']
+
+        gpt_message = ChatMessage(
+            text=gpt_reply,
+            is_users=False,
+            created_at=datetime.utcnow()
+        )
+        chat.messages.append(gpt_message)
+        chat.save()
+
+        return jsonify({'status': 'success', 'message': 'Message sent successfully'}), 200
+
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 
-@chat.route('/get-all-messages', methods=['POST'])
+@chat.route('/get-all-messages', methods=['GET'])
+@jwt_required
 def get_all_messages():
-    pass
+    try:
+        user_id = ObjectId(request.user_id)
+        data = request.json
+        chat_id = data.get('chat_id')
+
+        if not chat_id:
+            return jsonify({'status': 'error', 'message': 'Missing chat_id'}), 400
+
+        chat = Chat.objects(id=ObjectId(chat_id), user_id=user_id).first()
+
+        if not chat:
+            return jsonify({'status': 'error', 'message': 'Chat not found'}), 404
+
+        messages = [{
+            'text': message.text,
+            'is_users': message.is_users,
+            'created_at': message.created_at
+        } for message in chat.messages]
+
+        return jsonify({'status': 'success', 'messages': messages}), 200
+
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
