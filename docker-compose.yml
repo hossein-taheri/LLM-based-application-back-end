@@ -13,7 +13,7 @@ services:
       MONGO_DB_USER: root
       MONGO_DB_PASSWORD: jCGvr4E6hJk4ejLcdWIhAbcjdu4qUBLzMc0BqrFe
   mongo:
-    image: mongo:latest
+    image: mongo:4
     container_name: mongodb
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
