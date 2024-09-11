@@ -10,7 +10,7 @@ from .blueprints.chat import chat
 def create_app():
     app = Flask(__name__)
 
-    CORS(app)
+    CORS(app, resources={r"/*": {"origins": "*"}})
 
     app.register_blueprint(home, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/auth')
