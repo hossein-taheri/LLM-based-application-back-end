@@ -36,7 +36,7 @@ class Chat(me.Document):
     messages = me.EmbeddedDocumentListField(document_type=ChatMessage, default=[
         ChatMessage(
             text=default_system_prompt,
-            is_system=True,
+            is_systems=True,
             created_at=datetime.utcnow()
         )
     ])
