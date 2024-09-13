@@ -1,7 +1,7 @@
-import os
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import os
 
 sender_email = os.getenv("EMAIL_ADDRESS")
 sender_password = os.getenv("EMAIL_PASSWORD")
@@ -26,11 +26,11 @@ def send_email(receiver_email, email_subject, email_body):
 
     msg.attach(MIMEText(email_body, 'html'))
 
-    server = smtplib.SMTP(
+    # Connect using SSL instead of STARTTLS
+    server = smtplib.SMTP_SSL(
         os.getenv("EMAIL_SERVICE_PROVIDER_ADDRESS", 'smtp.gmail.com'),
-        int(os.getenv("EMAIL_SERVICE_PROVIDER_PORT", 587))
+        int(os.getenv("EMAIL_SERVICE_PROVIDER_PORT", 465))
     )
-    server.starttls()
     server.login(sender_email, sender_password)
     server.sendmail(sender_email, receiver_email, msg.as_string())
     server.quit()

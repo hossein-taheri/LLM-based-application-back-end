@@ -6,6 +6,7 @@ services:
     ports:
       - "5000:5000"
       - "587:587"
+      - "465:465"
       - "25:25"
     depends_on:
       - mongo
