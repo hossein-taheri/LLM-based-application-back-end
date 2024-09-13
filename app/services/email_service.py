@@ -9,6 +9,13 @@ sender_password = os.getenv("EMAIL_PASSWORD")
 front_end_url = os.getenv("FRONT_END_URL")
 
 
+def read_template(template_name, replacements):
+    content = open("app/templates/" + template_name, "rb").read().decode("utf-8")
+    for replacement_key in replacements:
+        content = content.replace(replacement_key, replacements[replacement_key])
+    return content
+
+
 def send_email(receiver_email, email_subject, email_body):
     msg = MIMEMultipart()
     msg['From'] = sender_email
@@ -33,7 +40,9 @@ def send_email(receiver_email, email_subject, email_body):
 
 def send_verification_email(user_email, verification_token):
     verification_link = front_end_url + "/#/auth/verify-email/?verification_token=" + verification_token
-    email_body = f"Please verify your email by clicking the following link: {verification_link}"
+    email_body = read_template("verify-email.html", {
+        "<verification_link>": verification_link
+    })
 
     send_email(
         user_email,
@@ -44,7 +53,9 @@ def send_verification_email(user_email, verification_token):
 
 def send_forgot_password(user_email, forgot_password_token):
     reset_link = front_end_url + "/#/auth/set-new-password/?forgot_password_token=" + str(forgot_password_token)
-    email_body = f"Please reset your password using the following link: {reset_link}"
+    email_body = read_template("forgot-password.html", {
+        "<reset_link>": reset_link
+    })
 
     send_email(
         user_email,
