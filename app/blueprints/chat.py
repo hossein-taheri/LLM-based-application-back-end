@@ -6,7 +6,7 @@ from bson import ObjectId
 from flask import Blueprint, jsonify, request
 from openai import OpenAI
 
-from app.middleware.jwt_required import jwt_required
+from app.middlewares.jwt_required import jwt_required
 from app.models.chat import Chat, ChatMessage
 
 chat = Blueprint('chat', __name__)
