@@ -4,8 +4,7 @@ from app.models.user import User
 from datetime import datetime, timedelta
 from flask import Blueprint, jsonify, request
 from app.models.forgot_password_token import ForgotPasswordToken
-
-from app.services.email_service import send_verification_email, send_forgot_password
+from app.services.email_service import *
 
 auth = Blueprint('auth', __name__)
 
