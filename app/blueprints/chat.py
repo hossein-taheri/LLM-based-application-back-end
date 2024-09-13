@@ -1,13 +1,9 @@
-import os
-from datetime import datetime
-
-import openai
-from bson import ObjectId
-from flask import Blueprint, jsonify, request
 from openai import OpenAI
-
-from app.middlewares.jwt_required import jwt_required
+from bson import ObjectId
+from datetime import datetime
 from app.models.chat import Chat, ChatMessage
+from flask import Blueprint, jsonify, request
+from app.middlewares.jwt_required import jwt_required
 
 chat = Blueprint('chat', __name__)
 
@@ -69,8 +65,9 @@ def send_message():
         chat.save()
 
         previous_messages = [
-            {'role': 'user' if msg.is_users else 'assistant', 'content': msg.text}
-            for msg in chat.messages
+            {
+                'role': 'system' if msg.is_systems else 'user' if msg.is_users else 'assistant', 'content': msg.text
+            } for msg in chat.messages
         ]
 
         previous_messages.append({
