@@ -24,18 +24,18 @@ def send_email(receiver_email, email_subject, email_body):
 
     msg.attach(MIMEText(email_body, 'html'))
 
-    try:
-        server = smtplib.SMTP(
-            os.getenv("EMAIL_SERVICE_PROVIDER_ADDRESS", 'smtp.gmail.com'),
-            int(os.getenv("EMAIL_SERVICE_PROVIDER_PORT", 587))
-        )
-        server.starttls()
-        server.login(sender_email, sender_password)
-        server.sendmail(sender_email, receiver_email, msg.as_string())
-        server.quit()
-        print(f"Verification email sent to {receiver_email}")
-    except Exception as e:
-        print(f"Failed to send email. Error: {e}")
+    # try:
+    server = smtplib.SMTP(
+        os.getenv("EMAIL_SERVICE_PROVIDER_ADDRESS", 'smtp.gmail.com'),
+        int(os.getenv("EMAIL_SERVICE_PROVIDER_PORT", 587))
+    )
+    server.starttls()
+    server.login(sender_email, sender_password)
+    server.sendmail(sender_email, receiver_email, msg.as_string())
+    server.quit()
+    print(f"Verification email sent to {receiver_email}")
+    # except Exception as e:
+    #     print(f"Failed to send email. Error: {e}")
 
 
 def send_verification_email(user_email, verification_token):
