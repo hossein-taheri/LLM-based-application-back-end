@@ -1,9 +1,9 @@
 from openai import OpenAI
 from bson import ObjectId
 from datetime import datetime
-from app.models.chat import Chat, ChatMessage
 from flask import Blueprint, jsonify, request
 from app.middlewares.jwt_required import jwt_required
+from app.models.chat import Chat, ChatMessage, default_system_prompt
 
 chat = Blueprint('chat', __name__)
 
@@ -69,12 +69,11 @@ def send_message():
                 'role': 'system' if msg.is_systems else 'user' if msg.is_users else 'assistant', 'content': msg.text
             } for msg in chat.messages
         ]
-
-        previous_messages.append({
-            'role': 'user',
-            'content': message_text
-        })
-
+        previous_messages = [{
+            'role': 'system',
+            'content': default_system_prompt
+        }] + previous_messages
+        print(previous_messages)
         response = client.chat.completions.create(
             model="ft:gpt-4o-mini-2024-07-18:personal::9zIBverq",
             messages=previous_messages,
@@ -122,6 +121,7 @@ def get_all_messages():
         messages = [{
             'text': message.text,
             'is_users': message.is_users,
+            'is_systems': message.is_systems,
             'created_at': message.created_at
         } for message in chat.messages]
 

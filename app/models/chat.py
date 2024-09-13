@@ -33,11 +33,5 @@ class ChatMessage(me.EmbeddedDocument):
 
 class Chat(me.Document):
     user_id = me.ObjectIdField(required=True)
-    messages = me.EmbeddedDocumentListField(document_type=ChatMessage, default=[
-        ChatMessage(
-            text=default_system_prompt,
-            is_systems=True,
-            created_at=datetime.utcnow()
-        )
-    ])
+    messages = me.EmbeddedDocumentListField(document_type=ChatMessage, default=[])
     created_at = me.DateTimeField(required=True)
