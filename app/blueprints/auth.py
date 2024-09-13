@@ -84,9 +84,13 @@ def sign_in():
     }), 200
 
 
-@auth.route('/verify-email/<token>', methods=['POST'])
-def verify_email(token):
-    user = User.objects(verification_token=token).first()
+@auth.route('/verify-email', methods=['POST'])
+def verify_email():
+    data = request.json
+    email = data.get('email')
+    verification_token = data.get('verification_token')
+
+    user = User.objects(email=email, verification_token=verification_token).first()
 
     if not user:
         return jsonify({'error': 'Invalid or expired token'}), 400
