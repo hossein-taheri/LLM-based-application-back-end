@@ -38,7 +38,7 @@ def send_email(receiver_email, email_subject, email_body):
 
 
 def send_verification_email(user_email, verification_token):
-    verification_link = front_end_url + "/#/auth/verify-email/?verification_token=" + verification_token
+    verification_link = front_end_url + f"/#/auth/verify-email/?user_email={str(user_email)}&verification_token={str(verification_token)}"
     email_body = read_template("verify-email.html", {
         "<verification_link>": verification_link
     })
@@ -51,7 +51,7 @@ def send_verification_email(user_email, verification_token):
 
 
 def send_forgot_password(user_email, forgot_password_token):
-    reset_link = front_end_url + "/#/auth/set-new-password/?forgot_password_token=" + str(forgot_password_token)
+    reset_link = front_end_url + f"/#/auth/set-new-password/?user_email={str(user_email)}&forgot_password_token={str(forgot_password_token)}"
     email_body = read_template("forgot-password.html", {
         "<reset_link>": reset_link
     })
